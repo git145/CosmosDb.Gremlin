@@ -83,6 +83,8 @@ namespace CosmosDb.Gremlin
         private void AddServices(IServiceCollection services)
         {
             AddGremlinService(services);
+
+            services.AddTransient<IDatabaseService, DatabaseService>();
         }
 
         private void AddGremlinService(IServiceCollection services)

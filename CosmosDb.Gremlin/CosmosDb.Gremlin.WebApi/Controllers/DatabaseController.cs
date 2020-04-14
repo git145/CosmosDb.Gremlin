@@ -1,8 +1,8 @@
 ﻿using CosmosDb.Gremlin.Core.Interfaces.Services;
 using Gremlin.Net.Driver;
+using Gremlin.Net.Structure.IO.GraphSON;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -15,9 +15,14 @@ namespace CosmosDb.Gremlin.Controllers
     {
         private readonly IGremlinService _gremlinService;
 
-        public DatabaseController(IGremlinService gremlinService)
+        private readonly IDatabaseService _databaseService;
+
+        public DatabaseController(IGremlinService gremlinService,
+            IDatabaseService databaseService)
         {
             _gremlinService = gremlinService;
+
+            _databaseService = databaseService;
         }
 
         // GET api/<controller>
@@ -50,28 +55,24 @@ namespace CosmosDb.Gremlin.Controllers
         }
 
         // DELETE api/<controller>/clear
-        [HttpGet("clear")]
-        public async Task Clear()
+        [HttpGet("drop-graph")]
+        public async Task DropGraph()
         {
-            if (_gremlinService.MyGremlinServer != null) 
-            {
-                using (GremlinClient gremlinClient = new GremlinClient(_gremlinService.MyGremlinServer))
-                {
-                    string gremlinCode = "g.V()";
+            Console.WriteLine("Received a call to drop the graph");
 
-                    try
-                    {
-                        await gremlinClient.SubmitAsync(gremlinCode);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.WriteLine($"Could not delete the graph: {e}");
-                    }
+            if (_gremlinService.MyGremlinServer != null)
+            {
+                using (GremlinClient gremlinClient = new GremlinClient(_gremlinService.MyGremlinServer,
+                    new GraphSON2Reader(),
+                    new GraphSON2Writer(),
+                    GremlinClient.GraphSON2MimeType))
+                {
+                    await _databaseService.DropGraph(gremlinClient);
                 }
             }
             else
             {
-                Debug.WriteLine("Could not complete the operation as the gremlin server object is null.");
+                Console.WriteLine("ERROR - Could not clear the graph as the gremlin server object is null");
             }
         }
     }
