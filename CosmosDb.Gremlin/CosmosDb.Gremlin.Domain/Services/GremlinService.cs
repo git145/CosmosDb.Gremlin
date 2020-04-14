@@ -21,7 +21,7 @@ namespace CosmosDb.Gremlin.Domain.Services
                 MyGremlinServer = new GremlinServer(gremlinServerConfiguration.Hostname,
                     gremlinServerConfiguration.Port,
                     gremlinServerConfiguration.IsSsl,
-                    gremlinServerConfiguration.Username,
+                    $"/dbs/{gremlinServerConfiguration.Database}/colls/{gremlinServerConfiguration.Graph}",
                     gremlinServerConfiguration.MasterKey);
             }
             catch (Exception e)

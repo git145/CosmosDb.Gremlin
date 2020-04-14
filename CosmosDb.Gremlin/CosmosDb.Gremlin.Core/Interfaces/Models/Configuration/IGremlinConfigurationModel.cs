@@ -8,7 +8,9 @@
 
         bool IsSsl { get; }
 
-        string Username { get; }
+        string Database { get; }
+
+        string Graph { get; }
 
         string MasterKey { get; }
     }
