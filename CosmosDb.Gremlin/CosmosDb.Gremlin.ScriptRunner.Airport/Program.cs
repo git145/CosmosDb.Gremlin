@@ -12,6 +12,8 @@ namespace CosmosDb.Gremlin.ScriptRunner
 {
     class Program
     {
+        private static readonly IDatabaseService _databaseService = new DatabaseService();
+
         static void Main(string[] args)
         {
             Console.WriteLine("Starting the script runner program");
@@ -24,16 +26,14 @@ namespace CosmosDb.Gremlin.ScriptRunner
 
             configuration.GetSection("Gremlin").Bind(gremlinConfigurationModel);
 
+            gremlinConfigurationModel.Graph = "Airport";
+
             IGremlinService gremlinService = new GremlinService(gremlinConfigurationModel);
 
-            IDatabaseService databaseService = new DatabaseService();
-
-            PopulateGraph(gremlinService,
-                databaseService);
+            _ = PopulateGraph(gremlinService);
         }
 
-        private static async Task PopulateGraph(IGremlinService gremlinService, 
-            IDatabaseService databaseService)
+        private static async Task PopulateGraph(IGremlinService gremlinService)
         {
             Console.WriteLine("Populating the graph");
 
@@ -44,9 +44,8 @@ namespace CosmosDb.Gremlin.ScriptRunner
                         new GraphSON2Writer(),
                         GremlinClient.GraphSON2MimeType))
                 {
-                    await databaseService.DropGraph(gremlinClient);
+                    await _databaseService.DropVertices(gremlinClient);
 
-                    /*
                     // --- Terminal 1 ---
 
                     // V: Terminal 1
@@ -131,13 +130,230 @@ namespace CosmosDb.Gremlin.ScriptRunner
 
                     // E: TerminalToNextTerminal / TerminalToPrevTerminal
                     await CreateTerminalToTerminal(gremlinClient, "Terminal 1", "Terminal 2", 10);
-                    */
+
+                    Console.ReadKey();
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine($"ERROR - Could not populate the graph: {e}");
             }
+        }
+
+        private static async Task CreateTerminal(GremlinClient client, 
+            string id)
+        {
+            var gremlinCode = $@"
+				g.addV('terminal')
+					.property('id', '{id}')
+					.property('city', 'LA')
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created vertex: Terminal '{id}'");
+        }
+
+        private static async Task CreateGate(GremlinClient client, 
+            string id)
+        {
+            var gremlinCode = $@"
+				g.addV('gate')
+					.property('id', '{id}')
+					.property('city', 'LA')
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created vertex: Gate '{id}'");
+        }
+
+        private static async Task CreateRestaurant(GremlinClient client, 
+            string id, 
+            decimal rating, 
+            decimal averagePrice)
+        {
+            var gremlinCode = $@"
+				g.addV('restaurant')
+					.property('id', '{id}')
+					.property('city', 'LA')
+					.property('rating', {rating})
+					.property('averagePrice', {averagePrice})
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created vertex: Restaurant '{id}'");
+        }
+
+        private static async Task CreateTerminalToGate(GremlinClient client, 
+            string terminal, 
+            string gate, 
+            int distanceInMinutes)
+        {
+            var gremlinCode = $@"
+				g.V()
+					.has('id', '{terminal}')
+					.addE('terminalToGate')
+					.property('distanceInMinutes', {distanceInMinutes})
+					.to(
+						g.V()
+							.has('id', '{gate}'))
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created edge: TerminalToGate '{terminal}' > '{gate}'");
+
+            gremlinCode = $@"
+				g.V()
+					.has('id', '{gate}')
+					.addE('gateToTerminal')
+					.property('distanceInMinutes', {distanceInMinutes})
+					.to(
+						g.V()
+							.has('id', '{terminal}'))
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created edge: GateToTerminal '{gate}' > '{terminal}'");
+        }
+
+        private static async Task CreateTerminalToRestaurant(GremlinClient client, 
+            string terminal, 
+            string restaurant, 
+            int distanceInMinutes)
+        {
+            var gremlinCode = $@"
+				g.V()
+					.has('id', '{terminal}')
+					.addE('terminalToRestaurant')
+					.property('distanceInMinutes', {distanceInMinutes})
+					.to(
+						g.V()
+							.has('id', '{restaurant}'))
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created edge: TerminalToRestaurant '{terminal}' > '{restaurant}'");
+
+            gremlinCode = $@"
+				g.V()
+					.has('id', '{restaurant}')
+					.addE('restaurantToTerminal')
+					.property('distanceInMinutes', {distanceInMinutes})
+					.to(
+						g.V()
+							.has('id', '{terminal}'))
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created edge: RestaurantToTerminal '{restaurant}' > '{terminal}'");
+        }
+
+        private static async Task CreateGateToGate(GremlinClient client, 
+            string gate1, 
+            string gate2, 
+            int distanceInMinutes)
+        {
+            var gremlinCode = $@"
+				g.V()
+					.has('id', '{gate1}')
+					.addE('gateToNextGate')
+					.property('distanceInMinutes', {distanceInMinutes})
+					.to(
+						g.V()
+							.has('id', '{gate2}'))
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created edge: GateToNextGate '{gate1}' > '{gate2}'");
+
+            gremlinCode = $@"
+				g.V()
+					.has('id', '{gate2}')
+					.addE('gateToPrevGate')
+					.property('distanceInMinutes', {distanceInMinutes})
+					.to(
+						g.V()
+							.has('id', '{gate1}'))
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created edge: GateToPrevGate '{gate2}' > '{gate1}'");
+        }
+
+        private static async Task CreateGateToRestaurant(GremlinClient client, 
+            string gate, 
+            string restaurant, 
+            int distanceInMinutes)
+        {
+            var gremlinCode = $@"
+				g.V()
+					.has('id', '{gate}')
+					.addE('gateToRestaurant')
+					.property('distanceInMinutes', {distanceInMinutes})
+					.to(
+						g.V()
+							.has('id', '{restaurant}'))
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created edge: GateToRestaurant '{gate}' > '{restaurant}'");
+
+            gremlinCode = $@"
+				g.V()
+					.has('id', '{restaurant}')
+					.addE('restaurantToGate')
+					.property('distanceInMinutes', {distanceInMinutes})
+					.to(
+						g.V()
+							.has('id', '{gate}'))
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created edge: RestaurantToGate '{restaurant}' > '{gate}'");
+        }
+
+        private static async Task CreateTerminalToTerminal(GremlinClient client, 
+            string terminal1, 
+            string terminal2, 
+            int distanceInMinutes)
+        {
+            var gremlinCode = $@"
+				g.V()
+					.has('id', '{terminal1}')
+					.addE('terminalToNextTerminal')
+					.property('distanceInMinutes', {distanceInMinutes})
+					.to(
+						g.V()
+							.has('id', '{terminal2}'))
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created edge: TerminalToNextTerminal '{terminal1}' > '{terminal2}'");
+
+            gremlinCode = $@"
+				g.V()
+					.has('id', '{terminal2}')
+					.addE('terminalToPrevTerminal')
+					.property('distanceInMinutes', {distanceInMinutes})
+					.to(
+						g.V()
+							.has('id', '{terminal1}'))
+			";
+
+            await _databaseService.ExecuteQuery(client, gremlinCode);
+
+            Console.WriteLine($"Created edge: TerminalToPrevTerminal '{terminal2}' > '{terminal1}'");
         }
     }
 }

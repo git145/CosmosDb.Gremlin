@@ -5,6 +5,11 @@ namespace CosmosDb.Gremlin.Core.Interfaces.Services
 {
     public interface IDatabaseService
     {
-        Task DropGraph(GremlinClient gremlinClient);
+        Task ExecuteQuery(GremlinClient gremlinClient,
+            string query);
+
+        Task DropEdges(GremlinClient gremlinClient);
+
+        Task DropVertices(GremlinClient gremlinClient);
     }
 }

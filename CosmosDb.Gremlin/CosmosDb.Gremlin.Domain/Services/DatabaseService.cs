@@ -8,26 +8,52 @@ namespace CosmosDb.Gremlin.Domain.Services
 {
     public class DatabaseService : IDatabaseService
     {
-        /*private readonly IGremlinService _gremlinService;
-
-        public DatabaseService(IGremlinService gremlinService)
+        public async Task ExecuteQuery(GremlinClient gremlinClient, 
+            string query)
         {
-            _gremlinService = gremlinService;
-        }*/
-
-        public async Task DropGraph(GremlinClient gremlinClient)
-        {
-            Console.WriteLine("Dropping the graph");
+            Console.WriteLine($"Excecuting the query \"{query}\"");
 
             try
             {
-                gremlinClient.SubmitAsync(GremlinCommands.DROP_GRAPH);
+                await gremlinClient.SubmitAsync(query);
 
-                Console.WriteLine("The graph was dropped successfully");
+                Console.WriteLine("The query was executed successfully");
             }
             catch (Exception e)
             {
-                Console.WriteLine($"ERROR - Could not clear the graph: {e}");
+                Console.WriteLine($"ERROR - Could not execute the query: {e}");
+            }
+        }
+
+        public async Task DropEdges(GremlinClient gremlinClient)
+        {
+            Console.WriteLine("Dropping the edges");
+
+            try
+            {
+                await gremlinClient.SubmitAsync(GremlinCommands.DROP_EDGES);
+
+                Console.WriteLine("The edges were dropped successfully");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"ERROR - Could not drop the edges: {e}");
+            }
+        }
+
+        public async Task DropVertices(GremlinClient gremlinClient)
+        {
+            Console.WriteLine("Dropping vertices");
+
+            try
+            {
+                await gremlinClient.SubmitAsync(GremlinCommands.DROP_VERTICES);
+
+                Console.WriteLine("The vertices were dropped successfully");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"ERROR - Could not drop the vertices {e}");
             }
         }
     }

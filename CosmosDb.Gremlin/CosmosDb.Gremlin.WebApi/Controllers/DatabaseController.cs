@@ -67,7 +67,7 @@ namespace CosmosDb.Gremlin.Controllers
                     new GraphSON2Writer(),
                     GremlinClient.GraphSON2MimeType))
                 {
-                    await _databaseService.DropGraph(gremlinClient);
+                    await _databaseService.DropVertices(gremlinClient);
                 }
             }
             else
