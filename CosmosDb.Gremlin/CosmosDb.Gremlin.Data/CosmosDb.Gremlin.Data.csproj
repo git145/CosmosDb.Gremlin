@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CosmosDb.Gremlin.Data\CosmosDb.Gremlin.Data.csproj" />
+    <ProjectReference Include="..\CosmosDb.Gremlin.Core\CosmosDb.Gremlin.Core.csproj" />
   </ItemGroup>
 
 </Project>

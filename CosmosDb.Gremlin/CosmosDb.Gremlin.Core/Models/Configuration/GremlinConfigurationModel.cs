@@ -10,7 +10,9 @@ namespace CosmosDb.Gremlin.Core.Models.Configuration
 
         public bool IsSsl { get; set; }
 
-        public string Username { get; set; }
+        public string Database { get; set; }
+
+        public string Graph { get; set; }
 
         public string MasterKey { get; set; }
     }
