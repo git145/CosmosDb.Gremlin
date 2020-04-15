@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDb.Gremlin.WebApi", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDb.Gremlin.Core", "CosmosDb.Gremlin.Core\CosmosDb.Gremlin.Core.csproj", "{AF23E80C-CF0A-49EC-B623-C9D191015240}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDb.Gremlin.Domain.Tests", "CosmosDb.Gremlin.Tests\CosmosDb.Gremlin.Domain.Tests.csproj", "{E3AE0CC7-B26C-435F-8688-C2CC49A18FCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDb.Gremlin.Domain.Tests", "CosmosDb.Gremlin.Domain.Tests\CosmosDb.Gremlin.Domain.Tests.csproj", "{E3AE0CC7-B26C-435F-8688-C2CC49A18FCC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDb.Gremlin.Domain", "CosmosDb.Gremlin.Domain\CosmosDb.Gremlin.Domain.csproj", "{AEA10317-3445-4E5D-A808-1B8846E01730}"
 EndProject
