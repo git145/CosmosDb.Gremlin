@@ -8,6 +8,14 @@ pool:
 
 steps:
 - script:
+    git config --global user.email "richardkneale@hotmail.co.uk"
+  displayName: 'Set email'
+
+- script:
+    git config --global user.name "git145"
+  displayName: 'Set name'
+
+- script:
     git pull https://github.com/git145/CosmosDb.Gremlin.git master
   displayName: 'Pull from GitHub'
 
