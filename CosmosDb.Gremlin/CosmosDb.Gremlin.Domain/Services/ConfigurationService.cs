@@ -10,9 +10,10 @@ namespace CosmosDb.Gremlin.Domain.Services
         {
             IConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
 
-            AddConfigurationFile(configurationBuilder, 
+            AddConfigurationFile(configurationBuilder,
                 "appsettings.json");
 
+            // Remember to create this file as it is not committed
             AddConfigurationFile(configurationBuilder,
                 "Configuration/GremlinConfiguration.json");
 
@@ -21,7 +22,7 @@ namespace CosmosDb.Gremlin.Domain.Services
             return configuration;
         }
 
-        private void AddConfigurationFile(IConfigurationBuilder configurationBuilder, 
+        private void AddConfigurationFile(IConfigurationBuilder configurationBuilder,
             string filePath)
         {
             Console.WriteLine($"Looking for configuration file \"{filePath}\"");

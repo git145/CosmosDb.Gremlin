@@ -49,6 +49,7 @@ namespace CosmosDb.Gremlin
 
         private void AddFixedConfiguration(IConfigurationBuilder configurationBuilder)
         {
+            // Remember to create this file as it is not committed
             configurationBuilder.AddJsonFile(@"Configuration\GremlinConfiguration.json");
         }
 
