@@ -8,15 +8,7 @@ pool:
 
 steps:
 - script:
-    git config --global user.email "richardkneale@hotmail.co.uk"
-  displayName: 'Pull from GitHub'
-
-- script:
-    git config --global user.name "git145"
-  displayName: 'Push to GitHub'
-
-- script:
-    git pull --allow-unrelated-histories https://github.com/git145/CosmosDb.Gremlin.git master
+    git pull https://github.com/git145/CosmosDb.Gremlin.git master
   displayName: 'Pull from GitHub'
 
 - script:
