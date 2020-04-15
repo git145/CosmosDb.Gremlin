@@ -16,5 +16,9 @@ steps:
   displayName: 'Pull from GitHub'
 
 - script:
+    git pull https://github.com/git145/CosmosDb.Gremlin HEAD:master
+  displayName: 'Pull from GitHub'
+
+- script:
     git push https://$(gitHubPersonalToken)@github.com/git145/CosmosDb.Gremlin HEAD:master
   displayName: 'Push to GitHub'
