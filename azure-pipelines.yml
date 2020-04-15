@@ -16,7 +16,7 @@ steps:
   displayName: 'Pull from GitHub'
 
 - script:
-    git pull --allow-unrelated-histories https://github.com/git145/CosmosDb.Gremlin.git
+    git pull --allow-unrelated-histories https://github.com/git145/CosmosDb.Gremlin.git master
   displayName: 'Pull from GitHub'
 
 - script:
