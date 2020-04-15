@@ -2,7 +2,6 @@
 using CosmosDb.Gremlin.Core.Interfaces.Services;
 using Gremlin.Net.Driver;
 using System;
-using System.Diagnostics;
 
 namespace CosmosDb.Gremlin.Domain.Services
 {
@@ -16,6 +15,15 @@ namespace CosmosDb.Gremlin.Domain.Services
 
         private void Initialise(IGremlinConfigurationModel gremlinServerConfiguration)
         {
+            Console.WriteLine("Creating new gremlin service");
+
+            InitialiseGremlinServer(gremlinServerConfiguration);
+        }
+
+        private void InitialiseGremlinServer(IGremlinConfigurationModel gremlinServerConfiguration)
+        {
+            Console.WriteLine("Initialising new gremlin server");
+
             try
             {
                 MyGremlinServer = new GremlinServer(gremlinServerConfiguration.Hostname,
@@ -26,7 +34,7 @@ namespace CosmosDb.Gremlin.Domain.Services
             }
             catch (Exception e)
             {
-                Debug.WriteLine($"Error creating the gremlin server: {e}");
+                Console.WriteLine($"ERROR - Failed to initialise the gremlin server: {e}");
             }
         }
     }

@@ -1,8 +1,7 @@
 ﻿using CosmosDb.Gremlin.Core.Interfaces.Services;
 using Gremlin.Net.Driver;
+using Gremlin.Net.Structure.IO.GraphSON;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -15,64 +14,140 @@ namespace CosmosDb.Gremlin.Controllers
     {
         private readonly IGremlinService _gremlinService;
 
-        public DatabaseController(IGremlinService gremlinService)
+        private readonly IDatabaseService _databaseService;
+
+        public DatabaseController(IGremlinService gremlinService,
+            IDatabaseService databaseService)
         {
             _gremlinService = gremlinService;
+
+            _databaseService = databaseService;
         }
 
-        // GET api/<controller>
-        [HttpGet()]
-        public async Task<IActionResult> Get()
+        // GET api/<controller>/edges
+        [HttpGet("edges")]
+        public async Task<IActionResult> GetEdges()
         {
-            return Ok("Hello World!");
+            IActionResult response = BadRequest("Could not get edges");
+
+            if (_gremlinService.MyGremlinServer != null)
+            {
+                using (GremlinClient gremlinClient = new GremlinClient(_gremlinService.MyGremlinServer,
+                    new GraphSON2Reader(),
+                    new GraphSON2Writer(),
+                    GremlinClient.GraphSON2MimeType))
+                {
+                    string result = await _databaseService.GetEdges(gremlinClient);
+
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        response = Ok(result);
+                    }
+                }
+            }
+
+            return response;
+        }
+
+        // GET api/<controller>/vertices
+        [HttpGet("vertices")]
+        public async Task<IActionResult> GetVertices()
+        {
+            IActionResult response = BadRequest("Could not get vertices");
+
+            if (_gremlinService.MyGremlinServer != null)
+            {
+                using (GremlinClient gremlinClient = new GremlinClient(_gremlinService.MyGremlinServer,
+                    new GraphSON2Reader(),
+                    new GraphSON2Writer(),
+                    GremlinClient.GraphSON2MimeType))
+                {
+                    string result = await _databaseService.GetVertices(gremlinClient);
+
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        response = Ok(result);
+                    }
+                }
+            }
+
+            return response;
         }
 
         // POST api/<controller>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody]string value)
+        public async Task<IActionResult> Post([FromBody]string query)
         {
-            return Ok("Hello World!");
-        }
+            IActionResult response = BadRequest("The query was invalid");
 
-        // PUT api/<controller>/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, 
-            [FromBody]string value)
-        {
-            return Ok("Hello World!");
-        }
-
-        // DELETE api/<controller>/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            return Ok("Hello World!");
-        }
-
-        // DELETE api/<controller>/clear
-        [HttpGet("clear")]
-        public async Task Clear()
-        {
-            if (_gremlinService.MyGremlinServer != null) 
+            if (_gremlinService.MyGremlinServer != null)
             {
-                using (GremlinClient gremlinClient = new GremlinClient(_gremlinService.MyGremlinServer))
+                using (GremlinClient gremlinClient = new GremlinClient(_gremlinService.MyGremlinServer,
+                    new GraphSON2Reader(),
+                    new GraphSON2Writer(),
+                    GremlinClient.GraphSON2MimeType))
                 {
-                    string gremlinCode = "g.V()";
+                    string result = await _databaseService.ExecuteQuery(gremlinClient, 
+                        query);
 
-                    try
+                    if(!string.IsNullOrEmpty(result))
                     {
-                        await gremlinClient.SubmitAsync(gremlinCode);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.WriteLine($"Could not delete the graph: {e}");
+                        response = Ok(result);
                     }
                 }
             }
-            else
+
+            return response;
+        }
+
+        // DELETE api/<controller>/drop/edges
+        [HttpDelete("drop/edges")]
+        public async Task<IActionResult> DropEdges()
+        {
+            IActionResult response = BadRequest("Failed to drop the edges");
+
+            if (_gremlinService.MyGremlinServer != null)
             {
-                Debug.WriteLine("Could not complete the operation as the gremlin server object is null.");
+                using (GremlinClient gremlinClient = new GremlinClient(_gremlinService.MyGremlinServer,
+                    new GraphSON2Reader(),
+                    new GraphSON2Writer(),
+                    GremlinClient.GraphSON2MimeType))
+                {
+                    string result = await _databaseService.DropEdges(gremlinClient);
+
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        response = Ok(result);
+                    }
+                }
             }
+
+            return response;
+        }
+
+        // DELETE api/<controller>/drop/vertices
+        [HttpDelete("drop/vertices")]
+        public async Task<IActionResult> DropVertices()
+        {
+            IActionResult response = BadRequest("Failed to drop the vertices");
+
+            if (_gremlinService.MyGremlinServer != null)
+            {
+                using (GremlinClient gremlinClient = new GremlinClient(_gremlinService.MyGremlinServer,
+                    new GraphSON2Reader(),
+                    new GraphSON2Writer(),
+                    GremlinClient.GraphSON2MimeType))
+                {
+                    string result = await _databaseService.DropVertices(gremlinClient);
+
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        response = Ok(result);
+                    }
+                }
+            }
+
+            return response;
         }
     }
 }

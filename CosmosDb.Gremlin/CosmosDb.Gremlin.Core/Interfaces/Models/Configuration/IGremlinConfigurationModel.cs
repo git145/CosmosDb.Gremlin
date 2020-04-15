@@ -10,7 +10,7 @@
 
         string Database { get; }
 
-        string Graph { get; }
+        string Graph { get; set; }
 
         string MasterKey { get; }
     }
