@@ -14,7 +14,7 @@ namespace CosmosDb.Gremlin.ScriptRunner
     {
         private static readonly IDatabaseService _databaseService = new DatabaseService();
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Starting the script runner program");
 
@@ -30,7 +30,7 @@ namespace CosmosDb.Gremlin.ScriptRunner
 
             IGremlinService gremlinService = new GremlinService(gremlinConfigurationModel);
 
-            _ = PopulateGraph(gremlinService);
+            await PopulateGraph(gremlinService);
         }
 
         private static async Task PopulateGraph(IGremlinService gremlinService)
@@ -130,8 +130,6 @@ namespace CosmosDb.Gremlin.ScriptRunner
 
                     // E: TerminalToNextTerminal / TerminalToPrevTerminal
                     await CreateTerminalToTerminal(gremlinClient, "Terminal 1", "Terminal 2", 10);
-
-                    Console.ReadKey();
                 }
             }
             catch (Exception e)
