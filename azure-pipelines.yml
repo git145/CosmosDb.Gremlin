@@ -8,7 +8,7 @@ pool:
 
 steps:
 - script:
-    git pull https://https://github.com/git145/CosmosDb.Gremlin master
+    git pull https://github.com/git145/CosmosDb.Gremlin master
   displayName: 'Pull from GitHub'
 
 - script:
